@@ -1,4 +1,7 @@
 # React
+
+标签（空格分隔）： React
+
 ---
 
 ## 生命周期
@@ -23,7 +26,6 @@
 
 ![react.png-53kB][1]
 
-
 ## 坑
 
 ### `Router`
@@ -44,8 +46,8 @@
   >`BrowserRouter`需要和后端配合，重定向只能到首页，刷新就到404,兼容性低，可采用`HashRouter`
   
 
-`PropTypes`设置类型判断报错 
-
+### `PropTypes`设置类型判断报错 
+![image_1bv4fi1taef115r96ro1hpo1sct25.png-31.4kB][3]
 > `error: TypeError: Cannot read property 'string' of undefined` 
 版本问题：在`react 16`下PropTypes 独立成一个单独的包`prop-types`
 ```javascript
@@ -66,3 +68,4 @@ import React, { Component ,PropTypes} from 'react';
 
   [1]: http://static.zybuluo.com/zChange/g6qb1n8v9opyqazbz1bou8ee/react.png
   [2]: http://static.zybuluo.com/zChange/jthbeob19uezxbsfxnjq16ii/image_1bu0jnod71skc1v5l177d1huafvo9.png
+  [3]: http://static.zybuluo.com/zChange/qv7aa2qgxadswqlg6p2cfs0y/image_1bv4fi1taef115r96ro1hpo1sct25.png
