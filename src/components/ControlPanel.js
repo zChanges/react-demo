@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import Counter from './Counter';
-
+import Summary from './Summary';
 
 class ControlPanel extends Component {
     
     render() {
         return (
             <div>
-                <Counter caption='第一个' oninitValue={0} />
-                {/* <Counter caption='第二个' oninitValue={1} /> */}
+                <Counter caption='First'/>
+                <Counter caption='Tow'/>
+                <Summary />
             </div>
         )
     }

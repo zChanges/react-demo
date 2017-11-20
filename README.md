@@ -4,6 +4,159 @@
 
 ---
 
+## flux
+
+### Jq模式
+>在一个文件中进行操作dom，逻辑判断，获取数据然后重新渲染页面。
+
+ - 优点：简便的通过一些api去操作dom，方便快捷，易于理解
+ - 缺点：都集中一个文件，当功能复杂下，代码杂乱不能快速定位问题，不易于维护，结构复杂。
+
+### MVC
+>MVC: M(数据层) V(控制层) C(视图层)
+把整个系统分层，M数据层、V视图层、C控制层。每个层相互独立，互不影响，每一层都向外开放一些接口(interface)，供其他层去调用，就实现了模块化。
+
+- 优点：结构明了，一层调用另外一层方法，不需要知道内部实现，只需要能得到结果，相互不影响，单一职责。（如一接口地址改变，只需要在M层中修改对应地址即可，其他层无需改变）
+- 缺点：当项目庞大时，难以扩展。视图和模型可能出现双向数据流，数据流错综复杂，不可预测性，难以调试维护
+
+### Flux模式
+> view(视图层)、Active(动作)、Dispatcher(派发器)、Store(数据层)。
+用户访问view，触发事件，发出active，Dispatcher接收到后，要求store对应更新，发出change事件，view接受到change事件触发更新。
+
+- 单向数据流。
+
+### Flux例子
+```javascript
+// ActionTypes.js
+// 声明动作类型
+export const INCREMENT = 'increment';
+export const DECREMENT = 'decrement';
+
+//AppDispatcher.js
+import { Dispatcher } from 'flux';
+export default new Dispatcher();
+
+// Active.js
+// 执行的动作，然后通过dispatcher去派发
+import AppDispatcher from './AppDispatcher.js';
+import * as ActionTypes from './ActionTypes';
+export const increment = (counterCaption) => {
+    AppDispatcher.dispatch({
+        type: ActionTypes.INCREMENT,
+        counterCaption: counterCaption
+    })
+}
+
+export const decrement = (counterCaption) => {
+    AppDispatcher.dispatch({
+        type: ActionTypes.DECREMENT,
+        counterCaption: counterCaption
+    })
+}
+```
+
+```javascript
+// CounterStore.js
+import { EventEmitter } from "events";
+import AppDispatcher from '../AppDispatcher';
+import * as ActionTypes from '../ActionTypes';
+// listener type值
+const CHANGE_EVENT = 'changed';
+// 初始化参数
+const counterValues = {
+  First: 0,
+  Tow: 10
+};
+
+//通过Object.assign克隆EventEmitter原型上的方法，
+//添加监听方法的，发送消息方法，删除监听方法，获取初始化值。
+const CounterStore = Object.assign({}, EventEmitter.prototype, {
+  getCounterValues: () => {
+    return counterValues;
+  },
+  emitChange: function() {
+    this.emit(CHANGE_EVENT);
+  },
+  addChangeListener: function(callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+  removerChangeListener: function(callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// 登记各种action回调，当dispatch收到ActionTypes动作后就执行相应的回调
+CounterStore.dispatchToken = AppDispatcher.register((action) => {
+    if(action.type === ActionTypes.INCREMENT){
+        counterValues[action.counterCaption] ++;
+        CounterStore.emitChange();
+    }else if(action.type === ActionTypes.DECREMENT){    
+        counterValues[action.counterCaption] --;
+        CounterStore.emitChange();
+    }
+})
+export default CounterStore;
+```
+ > 1.初始化获取count的值`CounterStore.getCounterValues()[this.props.caption]`
+ 2.渲染完成后添加监听和添加回调`CounterStore.addChangeListener(this.onChange);`
+ 3.点击按钮执行动作，并派发`Actions.increment(this.props.caption)`
+ 4.派发后进入`dispatcher.register`登记，执行对应的发送消息`emitChage()`
+ 5.一开始监听的消息被触发，触发后执行回调`onChange()`,先从CounterStore中获取改变后的count，然后更新`this.setState({count: newCount});`
+ **整体流程：点击按钮后执行Active => (dispather)派发 => Store对应更新数据(触发change) => 页面监听到更新render** 
+```javascript
+//Counter.js
+import React, { Component} from 'react';
+import PropTypes from 'prop-types';
+import * as Actions from '../flux/Actions';
+import CounterStore from '../flux/stores/CounterStore';
+class Counter extends Component {
+    constructor(props) {
+        console.log('constructor');
+        super(props)
+        this.state = {
+            count : CounterStore.getCounterValues()[this.props.caption]
+        }
+    }
+
+    onClickIncrementButton = () => {
+        Actions.increment(this.props.caption)
+        // this.setState({ count: this.state.count + 1})
+    }
+
+    onClickDecrementButton = () => {
+        Actions.decrement(this.props.caption)
+        // this.setState({ count: this.state.count - 1})
+    }
+    
+    // 初始化渲染触发
+    render() {
+        const { caption } = this.props
+        return (
+         <div>
+            <button style={buttonStyle} onClick={this.onClickIncrementButton}> + </button> 
+            <button style={buttonStyle} onClick={this.onClickDecrementButton}> - </button> 
+            {caption}   {this.state.count}
+         </div> 
+        )
+    }
+  
+    // 初始化渲染
+    componentDidMount() {
+        CounterStore.addChangeListener(this.onChange);
+    }
+
+    onChange = () => {
+        const newCount = CounterStore.getCounterValues()[this.props.caption];
+        this.setState({count: newCount});
+    }
+  }
+  
+  export default Counter
+```
+
+ 
+ 
+
 ## 生命周期
 
 ### 初始化 首次render（Mounting）

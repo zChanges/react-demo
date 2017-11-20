@@ -1,5 +1,8 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
+import * as Actions from '../flux/Actions';
+import CounterStore from '../flux/stores/CounterStore';
+
 const buttonStyle  = {
     margin: '10px'
 }
@@ -9,27 +12,20 @@ class Counter extends Component {
         console.log('constructor');
         super(props)
         this.state = {
-            count : this.props.initValue
+            count : CounterStore.getCounterValues()[this.props.caption]
         }
         // this.onClickIncrementButton = this.onClickIncrementButton.bind(this);
-        // this.onClickDecrementButton = this.onClickDecrementButton.bind(this);
-        var a = {List:[1,2,-1,-2]};  
-        var newa = [];
-        a.List.forEach((item)=>{
-            item = item < 1 ? 0 : item;
-            newa.push(item);
-        }); 
-        a.List = newa;
-        console.log(a)
-        
+        // this.onClickDecrementButton = this.onClickDecrementButton.bind(this);      
     }
 
     onClickIncrementButton = () => {
-        this.setState({ count: this.state.count + 1})
+        Actions.increment(this.props.caption)
+        // this.setState({ count: this.state.count + 1})
     }
 
     onClickDecrementButton = () => {
-        this.setState({ count: this.state.count - 1})
+        Actions.decrement(this.props.caption)
+        // this.setState({ count: this.state.count - 1})
     }
 
     
@@ -78,6 +74,12 @@ class Counter extends Component {
     componentDidMount() {
         // render之后
         console.log('componentDidmount 组件(及子组建)加载完成后执行，可在其中操作DOM 使用Refs')
+        CounterStore.addChangeListener(this.onChange);
+    }
+
+    onChange = () => {
+        const newCount = CounterStore.getCounterValues()[this.props.caption];
+        this.setState({count: newCount});
     }
 
     
@@ -86,8 +88,9 @@ class Counter extends Component {
         console.log('componentDidUpdate   和componentDidMount声明周期对应(挂载时候只执行一次)，每次更新渲染之后会被调用')
     }
 
-    componentWillUnmount() {
+    componentWillUnmount = () => {
         console.log('componentWillUnmount 组件被销毁时触发')
+        CounterStore.removerChangeListener(this.onChange);
     }
 
 
