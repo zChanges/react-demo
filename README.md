@@ -1,6 +1,6 @@
 # React
 
-标签（空格分隔）： React
+tags： React
 
 ---
 

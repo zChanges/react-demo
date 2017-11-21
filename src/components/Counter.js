@@ -1,7 +1,11 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
-import * as Actions from '../flux/Actions';
+// import * as Actions from '../flux/Actions';
 import CounterStore from '../flux/stores/CounterStore';
+
+import store from '../redux/Store';
+import * as Actions from '../redux/Actions';
+
 
 const buttonStyle  = {
     margin: '10px'
@@ -11,21 +15,25 @@ class Counter extends Component {
     constructor(props) {
         console.log('constructor');
         super(props)
-        this.state = {
-            count : CounterStore.getCounterValues()[this.props.caption]
-        }
-        // this.onClickIncrementButton = this.onClickIncrementButton.bind(this);
-        // this.onClickDecrementButton = this.onClickDecrementButton.bind(this);      
+        // this.state = {
+        //     count : CounterStore.getCounterValues()[this.props.caption]
+        // }
+        this.state  = this.getValue();
+        this.onClickIncrementButton = this.onClickIncrementButton.bind(this);
+        this.onClickDecrementButton = this.onClickDecrementButton.bind(this);  
+        this.onChange = this.onChange.bind(this);    
     }
 
-    onClickIncrementButton = () => {
-        Actions.increment(this.props.caption)
+    onClickIncrementButton () {
         // this.setState({ count: this.state.count + 1})
+        // Actions.increment(this.props.caption) // flux
+        store.dispatch(Actions.increment(this.props.caption)) // redux
     }
 
-    onClickDecrementButton = () => {
-        Actions.decrement(this.props.caption)
+    onClickDecrementButton () {
         // this.setState({ count: this.state.count - 1})
+        // Actions.decrement(this.props.caption) // flux
+        store.dispatch(Actions.decrement(this.props.caption)) // redux
     }
 
     
@@ -44,10 +52,11 @@ class Counter extends Component {
     // setSetat触发
     shouldComponentUpdate(nextProps, nextState) {
         // 组件挂在后，每次调用setState setProps后出发，可以通过nextProps和和props来判断是否需要重新render
-        console.log(JSON.stringify(nextProps)+'————'+ JSON.stringify(this.props));
-        console.log(JSON.stringify(nextState)+'————'+ JSON.stringify(this.state));
-        console.log((nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count))
-        return (nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count);
+        // console.log(JSON.stringify(nextProps)+'————'+ JSON.stringify(this.props));
+        // console.log(JSON.stringify(nextState)+'————'+ JSON.stringify(this.state));
+        // console.log((nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count))
+        // return (nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count);
+        return true
     }
     
     componentWillUpdate() {
@@ -59,12 +68,13 @@ class Counter extends Component {
 
     // 初始化渲染触发
     render() {
-        const { caption } = this.props
+        const value = this.state.value;
+        const { caption } = this.props;
         return (
          <div>
             <button style={buttonStyle} onClick={this.onClickIncrementButton}> + </button> 
             <button style={buttonStyle} onClick={this.onClickDecrementButton}> - </button> 
-            {caption}   {this.state.count}
+            {caption}  {value}
          </div> 
         )
     }
@@ -74,12 +84,20 @@ class Counter extends Component {
     componentDidMount() {
         // render之后
         console.log('componentDidmount 组件(及子组建)加载完成后执行，可在其中操作DOM 使用Refs')
-        CounterStore.addChangeListener(this.onChange);
+        // CounterStore.addChangeListener(this.onChange); // flux
+        store.subscribe(this.onChange)
     }
 
-    onChange = () => {
-        const newCount = CounterStore.getCounterValues()[this.props.caption];
-        this.setState({count: newCount});
+    onChange () {
+        // const newCount = CounterStore.getCounterValues()[this.props.caption];
+        // this.setState({count: newCount}); // flux
+        this.setState(this.getValue());
+    }
+
+    getValue () {
+        return {
+            value: store.getState()[this.props.caption]
+        }
     }
 
     
@@ -90,7 +108,7 @@ class Counter extends Component {
 
     componentWillUnmount = () => {
         console.log('componentWillUnmount 组件被销毁时触发')
-        CounterStore.removerChangeListener(this.onChange);
+        // CounterStore.removerChangeListener(this.onChange); // flux
     }
 
 
