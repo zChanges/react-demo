@@ -6,6 +6,7 @@
     "flux": "^3.1.3",
     "prop-types": "^15.6.0",
     "react": "^16.1.1",
+    "react-addons-perf": "^15.4.2",
     "react-dom": "^16.1.1",
     "react-redux": "^5.0.6",
     "react-scripts": "1.0.17",
@@ -18,5 +19,8 @@
     "eject": "react-scripts eject"
   },
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "redux-immutable-state-invariant": "^2.1.0"
+  }
 }
