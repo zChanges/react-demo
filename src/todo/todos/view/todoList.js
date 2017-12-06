@@ -5,20 +5,20 @@ import { connect } from 'react-redux';
 import TodoItem from './todoItem';
 import { toggleTodo, removeTodo } from '../action';
 import {FilterTypes} from '../../../constants';
-const TodoList = ({ todos, onToggleTodo, onRemoveTodo }) => {
+const TodoList = ({todos, onToggleTodo, onRemoveTodo}) => {
   return (
-    <ul>
-      {
-        todos.map((item) => (
-          <TodoItem 
-            key={item.id}
-            text={item.text}
-            completed={item.completed}
-            onToggle={() => onToggleTodo(item.id)}
-            onRemove={() => onRemoveTodo(item.id)}
-          />
+    <ul className="todo-list">
+    {
+      todos.map((item) => (
+        <TodoItem
+          text={item.text}
+          completed={item.completed}
+          onToggle={() => onToggleTodo(item.id)}
+          onRemove={() => onRemoveTodo(item.id)}
+          key={item.id}
+        />
         ))
-      }
+    }
     </ul>
   );
 };
