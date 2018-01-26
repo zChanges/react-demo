@@ -3,9 +3,7 @@ import { connect } from 'react-redux';
 import { addTodo } from '../action';
 
 class AddTodo extends Component {
-  constructor(props, context) {
-    super(props, context);
-  }
+
 
   onSubmit = ev => {
     ev.preventDefault();
